@@ -4,6 +4,11 @@
     --yellow: #ffe66a;
     --green: #5fae3f;
     --green-light: #86d451;
+
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
 }
 
 * {
@@ -17,8 +22,16 @@ body {
     margin: 0;
 }
 
+html {
+    background: #081522;
+}
+
 body {
+    position: fixed;
+    inset: 0;
+
     overflow: hidden;
+    overscroll-behavior: none;
 
     background: #081522;
 
@@ -28,33 +41,46 @@ body {
         monospace;
 
     touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 button {
     font: inherit;
+    -webkit-tap-highlight-color: transparent;
 }
+
+/* Main game container */
 
 .game-screen {
     position: relative;
 
-    display: flex;
-
-    width: 100vw;
-    height: 100vh;
-
-    align-items: center;
-    justify-content: center;
-
-    overflow: hidden;
-}
-
-#game-canvas {
-    display: block;
-
     width: 100%;
     height: 100%;
 
-    object-fit: contain;
+    overflow: hidden;
+
+    background: #081522;
+}
+
+/*
+    The game always keeps its original 16:9 shape.
+    It scales down or up to fit every phone screen.
+*/
+
+#game-canvas {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    display: block;
+
+    width: min(100vw, calc(100vh * 16 / 9));
+    height: min(100vh, calc(100vw * 9 / 16));
+
+    transform: translate(-50%, -50%);
 
     background: #298eb8;
 
@@ -62,8 +88,12 @@ button {
     image-rendering: crisp-edges;
 }
 
+/* Interface overlay */
+
 .game-interface {
     position: absolute;
+    z-index: 10;
+
     inset: 0;
 
     pointer-events: none;
@@ -72,42 +102,72 @@ button {
 .top-bar {
     display: flex;
 
-    padding: 18px;
+    padding:
+        calc(10px + var(--safe-top))
+        calc(10px + var(--safe-right))
+        10px
+        calc(10px + var(--safe-left));
 
     align-items: flex-start;
     justify-content: space-between;
+
+    gap: 10px;
 }
 
 .location-panel,
-.objective-panel {
-    border: 4px solid var(--dark);
+.objective-panel,
+.inventory-panel {
+    border: clamp(2px, 0.7vw, 4px) solid var(--dark);
 
     background: rgb(16 24 32 / 88%);
     color: white;
 
-    box-shadow: 5px 5px 0 var(--dark);
+    box-shadow:
+        clamp(2px, 0.7vw, 5px)
+        clamp(2px, 0.7vw, 5px)
+        0
+        var(--dark);
 }
 
 .location-panel {
     display: flex;
-    padding: 10px 14px;
+
+    max-width: 62vw;
+
+    padding:
+        clamp(6px, 1.5vw, 10px)
+        clamp(8px, 2vw, 14px);
 
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
+}
+
+.location-panel strong {
+    overflow: hidden;
+
+    font-size: clamp(11px, 2.8vw, 16px);
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .small-label {
     color: var(--yellow);
 
-    font-size: 11px;
+    font-size: clamp(8px, 2vw, 11px);
     font-weight: bold;
+
     letter-spacing: 1px;
 }
 
 .pixel-button {
-    padding: 10px 15px;
+    min-width: 64px;
 
-    border: 4px solid var(--dark);
+    padding:
+        clamp(7px, 1.8vw, 10px)
+        clamp(9px, 2.2vw, 15px);
+
+    border: clamp(2px, 0.7vw, 4px) solid var(--dark);
 
     background: var(--green);
     color: white;
@@ -115,10 +175,16 @@ button {
     pointer-events: auto;
     cursor: pointer;
 
+    font-size: clamp(11px, 2.7vw, 15px);
     font-weight: bold;
+
     text-transform: uppercase;
 
-    box-shadow: 5px 5px 0 var(--dark);
+    box-shadow:
+        clamp(2px, 0.7vw, 5px)
+        clamp(2px, 0.7vw, 5px)
+        0
+        var(--dark);
 }
 
 .pixel-button:hover,
@@ -127,54 +193,73 @@ button {
 }
 
 .pixel-button:active {
-    transform: translate(3px, 3px);
+    transform: translate(2px, 2px);
 
-    box-shadow: 2px 2px 0 var(--dark);
+    box-shadow: 1px 1px 0 var(--dark);
 }
+
+/* Objective */
 
 .objective-panel {
     position: absolute;
 
-    top: 88px;
-    left: 18px;
+    top: calc(74px + var(--safe-top));
+    left: calc(10px + var(--safe-left));
 
     display: flex;
-    padding: 10px 14px;
+
+    max-width: min(62vw, 330px);
+
+    padding:
+        clamp(6px, 1.5vw, 10px)
+        clamp(8px, 2vw, 14px);
 
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
 }
+
+.objective-panel strong {
+    font-size: clamp(10px, 2.5vw, 14px);
+    line-height: 1.25;
+}
+
+/* Inventory */
+
 .inventory-panel {
     position: absolute;
 
-    top: 165px;
-    left: 18px;
+    top: calc(138px + var(--safe-top));
+    left: calc(10px + var(--safe-left));
 
     display: flex;
-    padding: 10px 14px;
+
+    max-width: min(70vw, 380px);
+
+    padding:
+        clamp(6px, 1.5vw, 10px)
+        clamp(8px, 2vw, 14px);
 
     flex-direction: column;
-    gap: 7px;
-
-    border: 4px solid var(--dark);
-
-    background: rgb(16 24 32 / 88%);
-    color: white;
-
-    box-shadow: 5px 5px 0 var(--dark);
+    gap: 6px;
 }
 
 .inventory-items {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px 18px;
 
-    font-size: 13px;
+    gap:
+        clamp(5px, 1.3vw, 9px)
+        clamp(9px, 2.5vw, 18px);
+
+    font-size: clamp(9px, 2.3vw, 13px);
 }
 
 .inventory-items strong {
     color: var(--yellow);
 }
+
+/* Touch controls */
+
 .touch-controls {
     position: absolute;
 
@@ -183,7 +268,12 @@ button {
     left: 0;
 
     display: flex;
-    padding: 20px;
+
+    padding:
+        12px
+        calc(12px + var(--safe-right))
+        calc(12px + var(--safe-bottom))
+        calc(12px + var(--safe-left));
 
     align-items: flex-end;
     justify-content: space-between;
@@ -194,15 +284,15 @@ button {
 .direction-controls {
     position: relative;
 
-    width: 180px;
-    height: 160px;
+    width: clamp(126px, 30vw, 180px);
+    height: clamp(112px, 27vw, 160px);
 
     pointer-events: auto;
 }
 
 .control-button,
 .interact-button {
-    border: 4px solid var(--dark);
+    border: clamp(2px, 0.8vw, 4px) solid var(--dark);
 
     background: rgb(33 68 90 / 88%);
     color: white;
@@ -211,7 +301,11 @@ button {
 
     font-weight: bold;
 
-    box-shadow: 4px 4px 0 var(--dark);
+    box-shadow:
+        clamp(2px, 0.7vw, 4px)
+        clamp(2px, 0.7vw, 4px)
+        0
+        var(--dark);
 
     user-select: none;
     -webkit-user-select: none;
@@ -220,10 +314,12 @@ button {
 .control-button {
     position: absolute;
 
-    width: 58px;
-    height: 58px;
+    width: clamp(42px, 10vw, 58px);
+    height: clamp(42px, 10vw, 58px);
 
-    font-size: 23px;
+    padding: 0;
+
+    font-size: clamp(16px, 4vw, 23px);
 }
 
 .control-button:active,
@@ -233,32 +329,39 @@ button {
 
     transform: translate(2px, 2px);
 
-    box-shadow: 2px 2px 0 var(--dark);
+    box-shadow: 1px 1px 0 var(--dark);
 }
+
+/*
+    Button positions use percentages so the pad remains
+    correctly shaped at different phone sizes.
+*/
 
 .up-button {
     top: 0;
-    left: 61px;
+    left: 34%;
 }
 
 .left-button {
-    top: 61px;
+    top: 38%;
     left: 0;
 }
 
 .down-button {
-    top: 61px;
-    left: 61px;
+    top: 38%;
+    left: 34%;
 }
 
 .right-button {
-    top: 61px;
-    left: 122px;
+    top: 38%;
+    right: 0;
 }
 
 .interact-button {
-    width: 92px;
-    height: 92px;
+    width: clamp(66px, 17vw, 92px);
+    height: clamp(66px, 17vw, 92px);
+
+    padding: 0;
 
     border-radius: 50%;
 
@@ -266,27 +369,36 @@ button {
 
     pointer-events: auto;
 
-    font-size: 18px;
+    font-size: clamp(13px, 3.2vw, 18px);
+
     text-transform: uppercase;
 }
 
+/* Message window */
+
 .message-box {
     position: absolute;
+    z-index: 30;
 
     top: 50%;
     left: 50%;
 
-    width: min(420px, 88vw);
-    padding: 17px;
+    width: min(420px, calc(100vw - 32px));
 
-    border: 5px solid var(--dark);
+    padding: clamp(12px, 3vw, 17px);
+
+    border: clamp(3px, 1vw, 5px) solid var(--dark);
 
     background: var(--cream);
     color: var(--dark);
 
     transform: translate(-50%, -50%);
 
-    box-shadow: 7px 7px 0 var(--dark);
+    box-shadow:
+        clamp(4px, 1.2vw, 7px)
+        clamp(4px, 1.2vw, 7px)
+        0
+        var(--dark);
 
     text-align: center;
 }
@@ -298,49 +410,127 @@ button {
 .message-box p {
     margin: 0;
 
+    font-size: clamp(12px, 3vw, 16px);
     font-weight: bold;
+    line-height: 1.4;
 }
 
-@media (pointer: fine) and (min-width: 900px) {
-    .touch-controls {
-        opacity: 0.55;
-    }
-}
+/* Very small phones */
 
-@media (max-width: 600px) {
-    .top-bar {
-        padding: 10px;
-    }
-
+@media (max-width: 380px) {
     .objective-panel {
-        top: 72px;
-        left: 10px;
+        top: calc(66px + var(--safe-top));
+
+        max-width: 58vw;
     }
 
-.location-panel,
-.objective-panel,
-.inventory-panel {
-    font-size: 12px;
-}
+    .inventory-panel {
+        top: calc(125px + var(--safe-top));
 
-.inventory-panel {
-    top: 140px;
-    left: 10px;
-
-    max-width: 210px;
-}
+        max-width: 65vw;
+    }
 
     .touch-controls {
-        padding: 12px;
+        padding-bottom:
+            calc(7px + var(--safe-bottom));
     }
 
     .direction-controls {
-        transform: scale(0.85);
-        transform-origin: bottom left;
+        width: 122px;
+        height: 108px;
+    }
+
+    .control-button {
+        width: 40px;
+        height: 40px;
     }
 
     .interact-button {
-        width: 78px;
-        height: 78px;
+        width: 62px;
+        height: 62px;
+    }
+}
+
+/* Short landscape phones */
+
+@media (orientation: landscape) and (max-height: 430px) {
+    .top-bar {
+        padding-top:
+            calc(6px + var(--safe-top));
+    }
+
+    .location-panel {
+        padding: 5px 8px;
+    }
+
+    .objective-panel {
+        top: calc(55px + var(--safe-top));
+
+        max-width: 40vw;
+
+        padding: 5px 8px;
+    }
+
+    .inventory-panel {
+        top: calc(103px + var(--safe-top));
+
+        max-width: 45vw;
+
+        padding: 5px 8px;
+    }
+
+    .touch-controls {
+        padding-top: 5px;
+        padding-bottom:
+            calc(7px + var(--safe-bottom));
+    }
+
+    .direction-controls {
+        width: 130px;
+        height: 112px;
+    }
+
+    .control-button {
+        width: 42px;
+        height: 42px;
+    }
+
+    .interact-button {
+        width: 64px;
+        height: 64px;
+    }
+}
+
+/* Portrait phones */
+
+@media (orientation: portrait) {
+    #game-canvas {
+        width: 100vw;
+        height: calc(100vw * 9 / 16);
+
+        top: 50%;
+    }
+
+    .objective-panel {
+        max-width: 72vw;
+    }
+
+    .inventory-panel {
+        max-width: 78vw;
+    }
+
+    .touch-controls {
+        bottom: max(
+            8px,
+            calc((100vh - (100vw * 9 / 16)) / 2)
+        );
+    }
+}
+
+/* Hide touch controls for mouse-only desktop devices */
+
+@media (hover: hover) and (pointer: fine) and (min-width: 1000px) {
+    .touch-controls {
+        opacity: 0.55;
     }
 }
