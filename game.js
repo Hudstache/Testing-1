@@ -9,12 +9,21 @@ const interactButton = document.querySelector("#interact-button");
 const messageBox = document.querySelector("#message-box");
 const messageText = document.querySelector("#message-text");
 
+const objectiveText = document.querySelector("#objective-text");
+
+const woodCount = document.querySelector("#wood-count");
+const stoneCount = document.querySelector("#stone-count");
+const foodCount = document.querySelector("#food-count");
+
 const controlButtons = Array.from(
     document.querySelectorAll(".control-button")
 );
 
 const GAME_WIDTH = canvas.width;
 const GAME_HEIGHT = canvas.height;
+
+const FOOD_OBJECTIVE = 6;
+const BUSH_RESPAWN_TIME = 10000;
 
 const island = {
     x: GAME_WIDTH / 2,
@@ -30,6 +39,12 @@ const player = {
     height: 32,
     speed: 190,
     direction: "down"
+};
+
+const inventory = {
+    wood: 0,
+    stone: 0,
+    food: 0
 };
 
 const keys = {
@@ -53,6 +68,29 @@ const rocks = [
     { x: 760, y: 265 }
 ];
 
+const berryBushes = [
+    {
+        x: 345,
+        y: 245,
+        active: true
+    },
+    {
+        x: 610,
+        y: 290,
+        active: true
+    },
+    {
+        x: 470,
+        y: 420,
+        active: true
+    },
+    {
+        x: 700,
+        y: 230,
+        active: true
+    }
+];
+
 const landmarks = [
     {
         x: 530,
@@ -68,8 +106,15 @@ const landmarks = [
 
 let lastTime = 0;
 let messageTimer = null;
+let objectiveComplete = false;
 
-function drawPixelRectangle(x, y, width, height, colour) {
+function drawPixelRectangle(
+    x,
+    y,
+    width,
+    height,
+    colour
+) {
     context.fillStyle = colour;
 
     context.fillRect(
@@ -82,18 +127,34 @@ function drawPixelRectangle(x, y, width, height, colour) {
 
 function drawBackground() {
     context.fillStyle = "#298eb8";
-    context.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+    context.fillRect(
+        0,
+        0,
+        GAME_WIDTH,
+        GAME_HEIGHT
+    );
 
     drawWaterPattern();
 }
 
 function drawWaterPattern() {
-    context.fillStyle = "rgba(143, 228, 245, 0.32)";
+    context.fillStyle =
+        "rgba(143, 228, 245, 0.32)";
 
-    for (let y = 25; y < GAME_HEIGHT; y += 45) {
-        const rowOffset = y % 90 === 0 ? 20 : 0;
+    for (
+        let y = 25;
+        y < GAME_HEIGHT;
+        y += 45
+    ) {
+        const rowOffset =
+            y % 90 === 0 ? 20 : 0;
 
-        for (let x = -30; x < GAME_WIDTH; x += 90) {
+        for (
+            let x = -30;
+            x < GAME_WIDTH;
+            x += 90
+        ) {
             context.fillRect(
                 x + rowOffset,
                 y,
@@ -143,7 +204,8 @@ function drawIsland() {
 }
 
 function drawGrassDetails() {
-    context.fillStyle = "rgba(48, 126, 57, 0.45)";
+    context.fillStyle =
+        "rgba(48, 126, 57, 0.45)";
 
     const details = [
         [360, 240],
@@ -230,6 +292,46 @@ function drawRock(rock) {
     );
 }
 
+function drawBerryBush(bush) {
+    if (!bush.active) {
+        return;
+    }
+
+    drawPixelRectangle(
+        bush.x - 20,
+        bush.y - 8,
+        40,
+        24,
+        "#276b3b"
+    );
+
+    drawPixelRectangle(
+        bush.x - 13,
+        bush.y - 18,
+        26,
+        18,
+        "#318749"
+    );
+
+    const berryPositions = [
+        [-12, -8],
+        [0, -13],
+        [12, -6],
+        [-4, 2],
+        [10, 7]
+    ];
+
+    berryPositions.forEach(([offsetX, offsetY]) => {
+        drawPixelRectangle(
+            bush.x + offsetX - 3,
+            bush.y + offsetY - 3,
+            6,
+            6,
+            "#c83d52"
+        );
+    });
+}
+
 function drawLandmark(landmark) {
     if (landmark.name === "Abandoned Camp") {
         drawPixelRectangle(
@@ -244,13 +346,28 @@ function drawLandmark(landmark) {
 
         context.beginPath();
 
-        context.moveTo(landmark.x - 25, landmark.y - 5);
-        context.lineTo(landmark.x, landmark.y - 35);
-        context.lineTo(landmark.x + 25, landmark.y - 5);
+        context.moveTo(
+            landmark.x - 25,
+            landmark.y - 5
+        );
+
+        context.lineTo(
+            landmark.x,
+            landmark.y - 35
+        );
+
+        context.lineTo(
+            landmark.x + 25,
+            landmark.y - 5
+        );
+
         context.fill();
     }
 
-    if (landmark.name === "Freshwater Spring") {
+    if (
+        landmark.name ===
+        "Freshwater Spring"
+    ) {
         context.beginPath();
 
         context.ellipse(
@@ -316,7 +433,9 @@ function drawPlayer() {
             4,
             "#101820"
         );
-    } else if (player.direction === "right") {
+    } else if (
+        player.direction === "right"
+    ) {
         drawPixelRectangle(
             x + 7,
             y - 8,
@@ -345,10 +464,12 @@ function drawPlayer() {
 
 function isInsideIsland(x, y) {
     const normalizedX =
-        (x - island.x) / (island.radiusX - 22);
+        (x - island.x) /
+        (island.radiusX - 22);
 
     const normalizedY =
-        (y - island.y) / (island.radiusY - 22);
+        (y - island.y) /
+        (island.radiusY - 22);
 
     return (
         normalizedX * normalizedX +
@@ -380,7 +501,10 @@ function updatePlayer(deltaTime) {
         player.direction = "down";
     }
 
-    if (movementX === 0 && movementY === 0) {
+    if (
+        movementX === 0 &&
+        movementY === 0
+    ) {
         return;
     }
 
@@ -418,6 +542,7 @@ function drawScene() {
     drawIsland();
 
     landmarks.forEach(drawLandmark);
+    berryBushes.forEach(drawBerryBush);
     trees.forEach(drawTree);
     rocks.forEach(drawRock);
 
@@ -425,11 +550,10 @@ function drawScene() {
 }
 
 function gameLoop(currentTime) {
-    const elapsedTime =
-        Math.min(
-            (currentTime - lastTime) / 1000,
-            0.05
-        );
+    const elapsedTime = Math.min(
+        (currentTime - lastTime) / 1000,
+        0.05
+    );
 
     lastTime = currentTime;
 
@@ -439,8 +563,29 @@ function gameLoop(currentTime) {
     window.requestAnimationFrame(gameLoop);
 }
 
+function updateInventoryDisplay() {
+    woodCount.textContent = inventory.wood;
+    stoneCount.textContent = inventory.stone;
+    foodCount.textContent = inventory.food;
+
+    if (
+        inventory.food >= FOOD_OBJECTIVE &&
+        !objectiveComplete
+    ) {
+        objectiveComplete = true;
+
+        objectiveText.textContent =
+            "Food collected — explore the abandoned camp";
+
+        showMessage(
+            "Objective complete! You collected enough food."
+        );
+    }
+}
+
 function showMessage(message) {
     messageText.textContent = message;
+
     messageBox.classList.remove("hidden");
 
     window.clearTimeout(messageTimer);
@@ -460,10 +605,47 @@ function distanceBetween(first, second) {
     );
 }
 
+function collectBerryBush(bush) {
+    if (!bush.active) {
+        return;
+    }
+
+    bush.active = false;
+
+    inventory.food += 2;
+
+    updateInventoryDisplay();
+
+    showMessage(
+        "Collected 2 food. The bush will regrow."
+    );
+
+    window.setTimeout(
+        () => {
+            bush.active = true;
+        },
+        BUSH_RESPAWN_TIME
+    );
+}
+
 function interact() {
+    const nearbyBush = berryBushes.find(
+        (bush) =>
+            bush.active &&
+            distanceBetween(player, bush) < 55
+    );
+
+    if (nearbyBush) {
+        collectBerryBush(nearbyBush);
+        return;
+    }
+
     const nearbyLandmark = landmarks.find(
         (landmark) =>
-            distanceBetween(player, landmark) < 65
+            distanceBetween(
+                player,
+                landmark
+            ) < 65
     );
 
     if (nearbyLandmark) {
@@ -500,15 +682,21 @@ function interact() {
         return;
     }
 
-    showMessage("There is nothing nearby to use.");
+    showMessage(
+        "There is nothing nearby to use."
+    );
 }
 
-function setDirection(direction, isPressed) {
+function setDirection(
+    direction,
+    isPressed
+) {
     keys[direction] = isPressed;
 
     const button = controlButtons.find(
         (controlButton) =>
-            controlButton.dataset.direction === direction
+            controlButton.dataset.direction ===
+            direction
     );
 
     if (button) {
@@ -524,27 +712,42 @@ document.addEventListener(
     (event) => {
         const key = event.key.toLowerCase();
 
-        if (key === "arrowup" || key === "w") {
+        if (
+            key === "arrowup" ||
+            key === "w"
+        ) {
             event.preventDefault();
             setDirection("up", true);
         }
 
-        if (key === "arrowdown" || key === "s") {
+        if (
+            key === "arrowdown" ||
+            key === "s"
+        ) {
             event.preventDefault();
             setDirection("down", true);
         }
 
-        if (key === "arrowleft" || key === "a") {
+        if (
+            key === "arrowleft" ||
+            key === "a"
+        ) {
             event.preventDefault();
             setDirection("left", true);
         }
 
-        if (key === "arrowright" || key === "d") {
+        if (
+            key === "arrowright" ||
+            key === "d"
+        ) {
             event.preventDefault();
             setDirection("right", true);
         }
 
-        if (key === "e" || key === " ") {
+        if (
+            key === "e" ||
+            key === " "
+        ) {
             event.preventDefault();
             interact();
         }
@@ -556,34 +759,49 @@ document.addEventListener(
     (event) => {
         const key = event.key.toLowerCase();
 
-        if (key === "arrowup" || key === "w") {
+        if (
+            key === "arrowup" ||
+            key === "w"
+        ) {
             setDirection("up", false);
         }
 
-        if (key === "arrowdown" || key === "s") {
+        if (
+            key === "arrowdown" ||
+            key === "s"
+        ) {
             setDirection("down", false);
         }
 
-        if (key === "arrowleft" || key === "a") {
+        if (
+            key === "arrowleft" ||
+            key === "a"
+        ) {
             setDirection("left", false);
         }
 
-        if (key === "arrowright" || key === "d") {
+        if (
+            key === "arrowright" ||
+            key === "d"
+        ) {
             setDirection("right", false);
         }
     }
 );
 
 controlButtons.forEach((button) => {
-    const direction = button.dataset.direction;
+    const direction =
+        button.dataset.direction;
 
     const startMoving = (event) => {
         event.preventDefault();
+
         setDirection(direction, true);
     };
 
     const stopMoving = (event) => {
         event.preventDefault();
+
         setDirection(direction, false);
     };
 
@@ -623,11 +841,18 @@ returnMenuButton.addEventListener(
 window.addEventListener(
     "blur",
     () => {
-        Object.keys(keys).forEach((direction) => {
-            setDirection(direction, false);
-        });
+        Object.keys(keys).forEach(
+            (direction) => {
+                setDirection(
+                    direction,
+                    false
+                );
+            }
+        );
     }
 );
 
+updateInventoryDisplay();
 drawScene();
+
 window.requestAnimationFrame(gameLoop);

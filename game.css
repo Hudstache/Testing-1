@@ -144,7 +144,37 @@ button {
     flex-direction: column;
     gap: 4px;
 }
+.inventory-panel {
+    position: absolute;
 
+    top: 165px;
+    left: 18px;
+
+    display: flex;
+    padding: 10px 14px;
+
+    flex-direction: column;
+    gap: 7px;
+
+    border: 4px solid var(--dark);
+
+    background: rgb(16 24 32 / 88%);
+    color: white;
+
+    box-shadow: 5px 5px 0 var(--dark);
+}
+
+.inventory-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+
+    font-size: 13px;
+}
+
+.inventory-items strong {
+    color: var(--yellow);
+}
 .touch-controls {
     position: absolute;
 
@@ -287,10 +317,18 @@ button {
         left: 10px;
     }
 
-    .location-panel,
-    .objective-panel {
-        font-size: 12px;
-    }
+.location-panel,
+.objective-panel,
+.inventory-panel {
+    font-size: 12px;
+}
+
+.inventory-panel {
+    top: 140px;
+    left: 10px;
+
+    max-width: 210px;
+}
 
     .touch-controls {
         padding: 12px;
