@@ -202,20 +202,7 @@ settingsPanel.addEventListener(
 saveSlotOneButton.addEventListener(
     "click",
     () => {
-        hidePanel(gamePanel);
-
-        showMessage(
-            "A new adventure will begin here."
-        );
-
-        /*
-            Later, when we create the playable game,
-            this button will open game.html.
-
-            The future code will be:
-
-            window.location.href = "game.html";
-        */
+        window.location.href = "game.html";
     }
 );
 

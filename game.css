@@ -1,0 +1,308 @@
+:root {
+    --dark: #101820;
+    --cream: #f7edc8;
+    --yellow: #ffe66a;
+    --green: #5fae3f;
+    --green-light: #86d451;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    overflow: hidden;
+
+    background: #081522;
+
+    font-family:
+        "Courier New",
+        Courier,
+        monospace;
+
+    touch-action: none;
+}
+
+button {
+    font: inherit;
+}
+
+.game-screen {
+    position: relative;
+
+    display: flex;
+
+    width: 100vw;
+    height: 100vh;
+
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+#game-canvas {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    background: #298eb8;
+
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.game-interface {
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+}
+
+.top-bar {
+    display: flex;
+
+    padding: 18px;
+
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.location-panel,
+.objective-panel {
+    border: 4px solid var(--dark);
+
+    background: rgb(16 24 32 / 88%);
+    color: white;
+
+    box-shadow: 5px 5px 0 var(--dark);
+}
+
+.location-panel {
+    display: flex;
+    padding: 10px 14px;
+
+    flex-direction: column;
+    gap: 4px;
+}
+
+.small-label {
+    color: var(--yellow);
+
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.pixel-button {
+    padding: 10px 15px;
+
+    border: 4px solid var(--dark);
+
+    background: var(--green);
+    color: white;
+
+    pointer-events: auto;
+    cursor: pointer;
+
+    font-weight: bold;
+    text-transform: uppercase;
+
+    box-shadow: 5px 5px 0 var(--dark);
+}
+
+.pixel-button:hover,
+.pixel-button:focus-visible {
+    background: var(--green-light);
+}
+
+.pixel-button:active {
+    transform: translate(3px, 3px);
+
+    box-shadow: 2px 2px 0 var(--dark);
+}
+
+.objective-panel {
+    position: absolute;
+
+    top: 88px;
+    left: 18px;
+
+    display: flex;
+    padding: 10px 14px;
+
+    flex-direction: column;
+    gap: 4px;
+}
+
+.touch-controls {
+    position: absolute;
+
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    display: flex;
+    padding: 20px;
+
+    align-items: flex-end;
+    justify-content: space-between;
+
+    pointer-events: none;
+}
+
+.direction-controls {
+    position: relative;
+
+    width: 180px;
+    height: 160px;
+
+    pointer-events: auto;
+}
+
+.control-button,
+.interact-button {
+    border: 4px solid var(--dark);
+
+    background: rgb(33 68 90 / 88%);
+    color: white;
+
+    cursor: pointer;
+
+    font-weight: bold;
+
+    box-shadow: 4px 4px 0 var(--dark);
+
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.control-button {
+    position: absolute;
+
+    width: 58px;
+    height: 58px;
+
+    font-size: 23px;
+}
+
+.control-button:active,
+.control-button.pressed,
+.interact-button:active {
+    background: #3a98b9;
+
+    transform: translate(2px, 2px);
+
+    box-shadow: 2px 2px 0 var(--dark);
+}
+
+.up-button {
+    top: 0;
+    left: 61px;
+}
+
+.left-button {
+    top: 61px;
+    left: 0;
+}
+
+.down-button {
+    top: 61px;
+    left: 61px;
+}
+
+.right-button {
+    top: 61px;
+    left: 122px;
+}
+
+.interact-button {
+    width: 92px;
+    height: 92px;
+
+    border-radius: 50%;
+
+    background: #c47734;
+
+    pointer-events: auto;
+
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+.message-box {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    width: min(420px, 88vw);
+    padding: 17px;
+
+    border: 5px solid var(--dark);
+
+    background: var(--cream);
+    color: var(--dark);
+
+    transform: translate(-50%, -50%);
+
+    box-shadow: 7px 7px 0 var(--dark);
+
+    text-align: center;
+}
+
+.message-box.hidden {
+    display: none;
+}
+
+.message-box p {
+    margin: 0;
+
+    font-weight: bold;
+}
+
+@media (pointer: fine) and (min-width: 900px) {
+    .touch-controls {
+        opacity: 0.55;
+    }
+}
+
+@media (max-width: 600px) {
+    .top-bar {
+        padding: 10px;
+    }
+
+    .objective-panel {
+        top: 72px;
+        left: 10px;
+    }
+
+    .location-panel,
+    .objective-panel {
+        font-size: 12px;
+    }
+
+    .touch-controls {
+        padding: 12px;
+    }
+
+    .direction-controls {
+        transform: scale(0.85);
+        transform-origin: bottom left;
+    }
+
+    .interact-button {
+        width: 78px;
+        height: 78px;
+    }
+}

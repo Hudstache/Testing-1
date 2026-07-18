@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0,
+        maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>Archipelago Adventure</title>
+
+    <link rel="stylesheet" href="game.css">
+</head>
+
+<body>
+    <main class="game-screen">
+        <canvas
+            id="game-canvas"
+            width="960"
+            height="540"
+            aria-label="Archipelago Adventure game"
+        ></canvas>
+
+        <section class="game-interface">
+            <div class="top-bar">
+                <div class="location-panel">
+                    <span class="small-label">LOCATION</span>
+                    <strong>Shipwreck Island</strong>
+                </div>
+
+                <button
+                    id="return-menu"
+                    type="button"
+                    class="pixel-button"
+                >
+                    Menu
+                </button>
+            </div>
+
+            <div class="objective-panel">
+                <span class="small-label">CURRENT OBJECTIVE</span>
+
+                <strong>Explore the island</strong>
+            </div>
+
+            <div
+                class="touch-controls"
+                aria-label="Touch movement controls"
+            >
+                <div class="direction-controls">
+                    <button
+                        type="button"
+                        class="control-button up-button"
+                        data-direction="up"
+                        aria-label="Move up"
+                    >
+                        ▲
+                    </button>
+
+                    <button
+                        type="button"
+                        class="control-button left-button"
+                        data-direction="left"
+                        aria-label="Move left"
+                    >
+                        ◀
+                    </button>
+
+                    <button
+                        type="button"
+                        class="control-button down-button"
+                        data-direction="down"
+                        aria-label="Move down"
+                    >
+                        ▼
+                    </button>
+
+                    <button
+                        type="button"
+                        class="control-button right-button"
+                        data-direction="right"
+                        aria-label="Move right"
+                    >
+                        ▶
+                    </button>
+                </div>
+
+                <button
+                    id="interact-button"
+                    type="button"
+                    class="interact-button"
+                >
+                    Use
+                </button>
+            </div>
+        </section>
+
+        <section
+            id="message-box"
+            class="message-box hidden"
+            aria-live="polite"
+        >
+            <p id="message-text"></p>
+        </section>
+    </main>
+
+    <script src="game.js"></script>
+</body>
+</html>
