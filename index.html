@@ -5,83 +5,205 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0"
+        content="width=device-width, initial-scale=1.0,
+        maximum-scale=1.0, user-scalable=no"
     >
 
     <title>Archipelago Adventure</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-        }
-
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            overflow: hidden;
-
-            background: linear-gradient(
-                #102344,
-                #205d91,
-                #3bb5d8
-            );
-
-            color: white;
-
-            font-family:
-                "Courier New",
-                monospace;
-        }
-
-        main {
-            text-align: center;
-        }
-
-        h1 {
-            margin: 0;
-
-            color: #ffe66a;
-
-            font-size: clamp(42px, 9vw, 86px);
-            line-height: 0.9;
-            text-transform: uppercase;
-
-            text-shadow:
-                5px 0 #101820,
-                -5px 0 #101820,
-                0 5px #101820,
-                0 -5px #101820,
-                7px 7px #7b4526;
-        }
-
-        p {
-            margin-top: 28px;
-
-            font-size: 18px;
-            font-weight: bold;
-
-            text-shadow: 3px 3px #101820;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <main>
-        <h1>
-            Archipelago<br>
-            Adventure
-        </h1>
+    <main class="game-menu">
 
-        <p>Your journey begins here.</p>
+        <!-- Decorative stars -->
+        <div class="star star-1"></div>
+        <div class="star star-2"></div>
+        <div class="star star-3"></div>
+        <div class="star star-4"></div>
+        <div class="star star-5"></div>
+
+        <!-- Clouds -->
+        <div class="cloud cloud-1">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="cloud cloud-2">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- Island decoration -->
+        <div class="island-decoration">
+            <div class="palm-tree">
+                <div class="palm-trunk"></div>
+                <div class="palm-leaf leaf-1"></div>
+                <div class="palm-leaf leaf-2"></div>
+                <div class="palm-leaf leaf-3"></div>
+                <div class="palm-leaf leaf-4"></div>
+            </div>
+
+            <div class="island-grass"></div>
+            <div class="island-sand"></div>
+        </div>
+
+        <!-- Main menu -->
+        <section class="menu-content">
+            <header class="title-area">
+                <h1 class="game-title">
+                    <span>Archipelago</span>
+                    <span>Adventure</span>
+                </h1>
+
+                <p class="subtitle">
+                    Explore the unknown seas
+                </p>
+            </header>
+
+            <nav class="menu-buttons" aria-label="Main menu">
+                <button
+                    type="button"
+                    class="menu-button selected"
+                    data-action="select-game"
+                >
+                    <span class="selector">▶</span>
+                    Select Game
+                </button>
+
+                <button
+                    type="button"
+                    class="menu-button"
+                    data-action="settings"
+                >
+                    <span class="selector">▶</span>
+                    Settings
+                </button>
+
+                <button
+                    type="button"
+                    class="menu-button"
+                    data-action="quit"
+                >
+                    <span class="selector">▶</span>
+                    Quit
+                </button>
+            </nav>
+
+            <p class="controls">
+                ↑ ↓ Navigate &nbsp; • &nbsp; Enter Select
+            </p>
+
+            <p
+                id="status-message"
+                class="status-message"
+                aria-live="polite"
+            ></p>
+        </section>
+
+        <!-- Moving ocean -->
+        <div class="ocean ocean-back"></div>
+        <div class="ocean ocean-front"></div>
+
+        <!-- Select game window -->
+        <section
+            id="game-panel"
+            class="popup hidden"
+            aria-hidden="true"
+        >
+            <div class="popup-window">
+                <h2>Select Game</h2>
+
+                <button
+                    type="button"
+                    class="save-slot"
+                    data-slot="1"
+                >
+                    <strong>Save Slot 1</strong>
+                    <span>New Adventure</span>
+                </button>
+
+                <button
+                    type="button"
+                    class="save-slot locked"
+                    disabled
+                >
+                    <strong>Save Slot 2</strong>
+                    <span>Locked</span>
+                </button>
+
+                <button
+                    type="button"
+                    class="save-slot locked"
+                    disabled
+                >
+                    <strong>Save Slot 3</strong>
+                    <span>Locked</span>
+                </button>
+
+                <button
+                    id="close-game-panel"
+                    type="button"
+                    class="back-button"
+                >
+                    Back
+                </button>
+            </div>
+        </section>
+
+        <!-- Settings window -->
+        <section
+            id="settings-panel"
+            class="popup hidden"
+            aria-hidden="true"
+        >
+            <div class="popup-window">
+                <h2>Settings</h2>
+
+                <label class="setting-row">
+                    <span>Music</span>
+                    <input
+                        id="music-setting"
+                        type="checkbox"
+                        checked
+                    >
+                </label>
+
+                <label class="setting-row">
+                    <span>Sound Effects</span>
+                    <input
+                        id="sound-setting"
+                        type="checkbox"
+                        checked
+                    >
+                </label>
+
+                <label class="setting-row volume-setting">
+                    <span>Volume</span>
+                    <input
+                        id="volume-setting"
+                        type="range"
+                        min="0"
+                        max="100"
+                        value="70"
+                    >
+                </label>
+
+                <button
+                    id="close-settings-panel"
+                    type="button"
+                    class="back-button"
+                >
+                    Back
+                </button>
+            </div>
+        </section>
+
     </main>
+
+    <script src="menu.js"></script>
 </body>
 </html>
